@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MAR.API.MortgageCalculator</name>
+    </assembly>
+    <members>
+        <member name="T:MAR.API.MortgageCalculator.Controllers.CalculateController">
+            <summary>
+            Calculation controller
+            </summary>
+        </member>
+        <member name="M:MAR.API.MortgageCalculator.Controllers.CalculateController.#ctor(Microsoft.Extensions.Logging.ILoggerFactory,Microsoft.Extensions.Localization.IStringLocalizer{MAR.API.MortgageCalculator.Localization.ErrorMessages},Microsoft.Extensions.Localization.IStringLocalizer{MAR.API.MortgageCalculator.Localization.ValidationMessages},MAR.API.MortgageCalculator.Logic.Interfaces.IMortgageCalculatorFacade)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="loggerFactory"></param>
+            <param name="errorMessagesLocalizer"></param>
+            <param name="validationMessagesLocalizer"></param>
+            <param name="mortgageCalculatorFacade"></param>
+        </member>
+        <member name="M:MAR.API.MortgageCalculator.Controllers.CalculateController.Calculate(MAR.API.MortgageCalculator.Model.Requests.MortgageCalculationRequest)">
+            <summary>
+            Calculate (free)
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+            Add rate limiting to this later
+        </member>
+        <member name="M:MAR.API.MortgageCalculator.Controllers.CalculateController.CalculateSecure(MAR.API.MortgageCalculator.Model.Requests.MortgageCalculationRequest)">
+            <summary>
+            Calculate (secure)
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="T:MAR.API.MortgageCalculator.Program">
+            <summary>
+            The program
+            </summary>
+        </member>
+        <member name="M:MAR.API.MortgageCalculator.Program.Main(System.String[])">
+            <summary>
+            The main entry points
+            </summary>
+            <param name="args"></param>
+        </member>
+        <member name="M:MAR.API.MortgageCalculator.Program.CreateHostBuilder(System.String[])">
+            <summary>
+            Host builder
+            </summary>
+            <param name="args"></param>
+            <returns></returns>
+        </member>
+        <member name="T:MAR.API.MortgageCalculator.Startup">
+            <summary>
+            The startup
+            </summary>
+        </member>
+        <member name="M:MAR.API.MortgageCalculator.Startup.#ctor(Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="configuration"></param>
+        </member>
+        <member name="P:MAR.API.MortgageCalculator.Startup.Configuration">
+            <summary>
+            Instance
+            </summary>
+        </member>
+        <member name="M:MAR.API.MortgageCalculator.Startup.ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            This method gets called by the runtime. Use this method to add services to the container.
+            </summary>
+            <param name="services"></param>
+        </member>
+        <member name="M:MAR.API.MortgageCalculator.Startup.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IWebHostEnvironment)">
+            <summary>
+            This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+            </summary>
+            <param name="app"></param>
+            <param name="env"></param>
+        </member>
+    </members>
+</doc>

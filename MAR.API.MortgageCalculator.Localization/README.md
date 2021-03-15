@@ -1,0 +1,1 @@
+﻿When updating entries in the resx files, make sure to update the UnitTests project dictionary(ies) as well.
