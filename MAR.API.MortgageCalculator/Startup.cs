@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using Serilog;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -82,6 +83,8 @@ namespace MAR.API.MortgageCalculator
             app.UseRequestLocalization();
 
             app.UseHttpsRedirection();
+
+            app.UseSerilogRequestLogging();
 
             app.UseRouting();
 
