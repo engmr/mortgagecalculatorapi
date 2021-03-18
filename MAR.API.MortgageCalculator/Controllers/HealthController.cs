@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
 namespace MAR.API.MortgageCalculator.Controllers
@@ -6,6 +7,7 @@ namespace MAR.API.MortgageCalculator.Controllers
     /// <summary>
     /// Health controller
     /// </summary>
+    [AllowAnonymous]
     [Route("[controller]")]
     [ApiController]
     public class HealthController : DomainBaseController

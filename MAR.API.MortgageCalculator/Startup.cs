@@ -44,6 +44,8 @@ namespace MAR.API.MortgageCalculator
         {
             services.AddLocalization();
             services.AddOptions();
+            services.AddMemoryCache();
+            services.AddHttpContextAccessor();
             services.Configure<RequestLocalizationOptions>(
                 options =>
                 {
@@ -63,17 +65,22 @@ namespace MAR.API.MortgageCalculator
                 var xmlFilePath = Path.Combine(System.AppContext.BaseDirectory, "MAR.API.MortgageCalculator.xml");
                 c.IncludeXmlComments(xmlFilePath);
             });
+            AddRateLimitingServices(services);
+            AddApiDomainServices(services);
+        }
+
+        private void AddApiDomainServices(IServiceCollection services)
+        {
             services.AddScoped<IHttpClientProvider, HttpClientProvider>();
             services.AddScoped<IMortgageCalculatorProviderFactory, MortgageCalculatorProviderFactory>();
             services.AddScoped<IMortgageCalculatorFacade, MortgageCalculatorFacade>();
+        }
 
-            //rate limit
-            services.AddMemoryCache();
+        private void AddRateLimitingServices(IServiceCollection services)
+        {
             services.Configure<IpRateLimitOptions>(Configuration.GetSection("IpRateLimiting"));
-            services.Configure<IpRateLimitPolicies>(Configuration.GetSection("IpRateLimitPolicies"));
             services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
             services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
-            services.AddHttpContextAccessor();
             services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
         }
 
@@ -84,6 +91,7 @@ namespace MAR.API.MortgageCalculator
         /// <param name="env"></param>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseIpRateLimiting();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -105,8 +113,6 @@ namespace MAR.API.MortgageCalculator
             {
                 endpoints.MapControllers();
             });
-
-            app.UseIpRateLimiting();
         }
     }
 }
