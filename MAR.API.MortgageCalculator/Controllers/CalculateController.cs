@@ -1,14 +1,11 @@
 ﻿using MAR.API.MortgageCalculator.Localization;
 using MAR.API.MortgageCalculator.Logic.Interfaces;
-using MAR.API.MortgageCalculator.Model.Dto;
 using MAR.API.MortgageCalculator.Model.Requests;
-using MAR.API.MortgageCalculator.Model.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace MAR.API.MortgageCalculator.Controllers
@@ -18,7 +15,7 @@ namespace MAR.API.MortgageCalculator.Controllers
     /// </summary>
     [Route("[controller]")]
     [ApiController]
-    public class CalculateController : ControllerBase
+    public class CalculateController : DomainBaseController
     {
         private ILoggerFactory _loggerFactory;
         private ILogger<CalculateController> _logger;
@@ -57,86 +54,36 @@ namespace MAR.API.MortgageCalculator.Controllers
         [HttpPost]
         public async Task<IActionResult> Calculate([FromBody] MortgageCalculationRequest request)
         {
-            var transactionId = GetTransactionId();
-            return await Task.Run<IActionResult>(() =>
+            using (_logger.BeginScope(GetTransactionLoggingScope()))
             {
-                var result = _mortgageCalculatorFacade.GetMortgageCalculation(request);
-                if (result.IsSuccessful)
+                _logger.LogInformation($"{nameof(Calculate)}" + " called with request {@request}");
+                return await Task.Run(() =>
                 {
-                    return Ok(new ApiResponse<MortgageCalculationResult>()
-                    {
-                        ResponseDateTime = DateTime.UtcNow,
-                        APIVersion = GetApiVersion(),
-                        ApplicationName = GetApplicationName(),
-                        TransactionId = transactionId,
-                        Data = result as MortgageCalculationResult
-                    });
-                }
-                return StatusCode((int)HttpStatusCode.BadRequest, new ApiResponse<MortgageCalculationResult>()
-                {
-                    ResponseDateTime = DateTime.UtcNow,
-                    APIVersion = GetApiVersion(),
-                    ApplicationName = GetApplicationName(),
-                    TransactionId = transactionId,
-                    Data = result as MortgageCalculationResult
+                    var result = _mortgageCalculatorFacade.GetMortgageCalculation(request);
+                    return GetResultForMortageCalculation(result);
                 });
-            });
+            }
         }
 
         /// <summary>
-        /// Calculate (secure)
+        /// Calculate (paid)
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
+        //[Authorize]
         [Produces("application/json")]
         [HttpPost]
-        public async Task<IActionResult> CalculateSecure([FromBody] MortgageCalculationRequest request)
+        public async Task<IActionResult> CalculatePaid([FromBody] MortgageCalculationRequest request)
         {
-            var transactionId = GetTransactionId();
-            return await Task.Run<IActionResult>(() =>
+            using (_logger.BeginScope(GetTransactionLoggingScope()))
             {
-                var result = _mortgageCalculatorFacade.GetMortgageCalculation(request);
-                if (result.IsSuccessful)
+                _logger.LogInformation($"{nameof(CalculatePaid)}" + " called with request {@request}");
+                return await Task.Run(() =>
                 {
-                    return Ok(new ApiResponse<MortgageCalculationResult>()
-                    {
-                        ResponseDateTime = DateTime.UtcNow,
-                        APIVersion = GetApiVersion(),
-                        ApplicationName = GetApplicationName(),
-                        TransactionId = transactionId,
-                        Data = result as MortgageCalculationResult
-                    });
-                }
-                return StatusCode((int)HttpStatusCode.BadRequest, new ApiResponse<MortgageCalculationResult>()
-                {
-                    ResponseDateTime = DateTime.UtcNow,
-                    APIVersion = GetApiVersion(),
-                    ApplicationName = GetApplicationName(),
-                    TransactionId = transactionId,
-                    Data = result as MortgageCalculationResult
+                    var result = _mortgageCalculatorFacade.GetMortgageCalculation(request);
+                    return GetResultForMortageCalculation(result);
                 });
-            });
+            }
         }
-
-        #region Move to base class / implement later
-
-        private Guid GetTransactionId()
-        {
-            return Guid.NewGuid();
-        }
-
-        private string GetApiVersion()
-        {
-            //return _apiVersionReader.Read(HttpContext.Request);
-            return "1.0.1";
-        }
-
-        private string GetApplicationName()
-        {
-            //return _appSettings.ApplicationName;
-            return "Mortgage Calculator API";
-        }
-
-        #endregion
     }
 }

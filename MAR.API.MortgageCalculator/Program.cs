@@ -1,8 +1,11 @@
+using AspNetCoreRateLimit;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace MAR.API.MortgageCalculator
 {
@@ -15,13 +18,17 @@ namespace MAR.API.MortgageCalculator
         /// The main entry points
         /// </summary>
         /// <param name="args"></param>
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
-
-
             try
             {
-                CreateHostBuilder(args).Build().Run();
+                var webHost = CreateHostBuilder(args).Build();
+                using (var scope = webHost.Services.CreateScope())
+                {
+                    var ipPolicyStore = scope.ServiceProvider.GetRequiredService<IIpPolicyStore>();
+                    await ipPolicyStore.SeedAsync();
+                }
+                webHost.Run();
                 Log.Information("Application is starting up...");
             }
             catch (Exception ex)

@@ -41,9 +41,9 @@ namespace MAR.API.MortgageCalculator.UnitTests.Services
             SetupHttpClientProvider(html);
             var provider = new CalculateNetCalculatorProvider(
                 _loggerFactory,
-                MockValidationMessagesLocalizer.Object, 
+                MockValidationMessagesLocalizer.Object,
                 MockErrorMessagesLocalizer.Object,
-                _httpClientProvider, 
+                _httpClientProvider,
                 expectedResult.Request);
 
             var actualResult = provider.PerformCalculation();
@@ -62,10 +62,42 @@ namespace MAR.API.MortgageCalculator.UnitTests.Services
             AssertThatResultsMatch(expectedResult, actualResult as MortgageCalculationResult);
         }
 
+        [Theory]
+        [ClassData(typeof(CalculatorNetCalculatorValidationFailureTestData))]
+        public void Should_fail_validation(string testCaseDescription, MortgageCalculationRequest request, List<string> expectedValidationErrors)
+        {
+            ConsoleLogger.WriteLine($"Test Case: {testCaseDescription}");
+            SetupHttpClientProvider(string.Empty);
+            var provider = new CalculateNetCalculatorProvider(
+                _loggerFactory,
+                MockValidationMessagesLocalizer.Object,
+                MockErrorMessagesLocalizer.Object,
+                _httpClientProvider,
+                request);
+
+            var actualResult = provider.PerformCalculation();
+
+            actualResult.Should().NotBeNull().And.BeOfType(typeof(MortgageCalculationResult));
+            if (actualResult.Errors?.Any() == true)
+            {
+                ConsoleLogger.WriteLine("--- Unexpected Errors ---");
+                actualResult.Errors.ForEach((e) => { ConsoleLogger.WriteLine(e); });
+                actualResult.Errors.Any().Should().BeFalse();
+            }
+            actualResult.IsSuccessful.Should().BeFalse();
+            actualResult.ValidationErrors?.Any().Should().BeTrue();
+            actualResult.ValidationErrors.Count.Should().Be(expectedValidationErrors.Count);
+            expectedValidationErrors.ForEach(expected =>
+            {
+                actualResult.ValidationErrors.SingleOrDefault(actual => actual == expected).Should().NotBeNull($"{expected} should be in the validation error list");
+            });
+        }
+
         private void AssertThatResultsMatch(MortgageCalculationResult expectedResult, MortgageCalculationResult actualResult)
         {
             //Request
             actualResult.Request.Should().NotBeNull();
+            actualResult.IsSuccessful.Should().Be(expectedResult.IsSuccessful);
             actualResult.Request.APR.Should().Be(expectedResult.Request.APR);
             actualResult.Request.DownPaymentPercent.Should().Be(expectedResult.Request.DownPaymentPercent);
             actualResult.Request.HOAMonthly.Should().Be(expectedResult.Request.HOAMonthly);
@@ -153,6 +185,105 @@ namespace MAR.API.MortgageCalculator.UnitTests.Services
                         MortgagePaymentyMonthly = 326.59M,
                         PropertyTaxPaymentMonthly = 95.83M,
                         TermInterestPaid = 37573.46M
+                    }
+                };
+            }
+
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        }
+
+        private class CalculatorNetCalculatorValidationFailureTestData : IEnumerable<object[]>
+        {
+            public IEnumerator<object[]> GetEnumerator()
+            {
+                yield return new object[]
+                {
+                    "APR validation failure, value is 0",
+                    new MortgageCalculationRequest()
+                    {
+                        APR = 0M,
+                        DownPaymentPercent = 20.00M,
+                        HOAMonthly = 0,
+                        HomeownerInsuranceRate = 0.22M,
+                        LoanTermYears = 30,
+                        PropertyTaxRate = 1.15M,
+                        PurchasePrice = 100000.00M
+                    },
+                    new List<string>()
+                    {
+                        "'APR' must be greater than '0.00'."
+                    }
+                };
+                yield return new object[]
+                {
+                    "APR validation failure, value is less than 0",
+                    new MortgageCalculationRequest()
+                    {
+                        APR = 0M,
+                        DownPaymentPercent = 20.00M,
+                        HOAMonthly = 0,
+                        HomeownerInsuranceRate = 0.22M,
+                        LoanTermYears = 30,
+                        PropertyTaxRate = 1.15M,
+                        PurchasePrice = 100000.00M
+                    },
+                    new List<string>()
+                    {
+                        "'APR' must be greater than '0.00'."
+                    }
+                };
+                yield return new object[]
+                {
+                    "DownPaymentPercent validation failure, value is 0",
+                    new MortgageCalculationRequest()
+                    {
+                        APR = 2.75M,
+                        DownPaymentPercent = 0.00M,
+                        HOAMonthly = 0,
+                        HomeownerInsuranceRate = 0.22M,
+                        LoanTermYears = 30,
+                        PropertyTaxRate = 1.15M,
+                        PurchasePrice = 100000.00M
+                    },
+                    new List<string>()
+                    {
+                        "'Down Payment Percent' must be greater than '0.00'."
+                    }
+                };
+                yield return new object[]
+                {
+                    "DownPaymentPercent validation failure, value is less than 0",
+                    new MortgageCalculationRequest()
+                    {
+                        APR = 2.75M,
+                        DownPaymentPercent = 0.00M,
+                        HOAMonthly = 0,
+                        HomeownerInsuranceRate = 0.22M,
+                        LoanTermYears = 30,
+                        PropertyTaxRate = 1.15M,
+                        PurchasePrice = 100000.00M
+                    },
+                    new List<string>()
+                    {
+                        "'Down Payment Percent' must be greater than '0.00'."
+                    }
+                };
+                yield return new object[]
+                {
+                    "HOAMonthly validation failure, value is less than 0",
+                    new MortgageCalculationRequest()
+                    {
+                        APR = 2.75M,
+                        DownPaymentPercent = 20.00M,
+                        HOAMonthly = -0.01M,
+                        HomeownerInsuranceRate = 0.22M,
+                        LoanTermYears = 30,
+                        PropertyTaxRate = 1.15M,
+                        PurchasePrice = 100000.00M
+                    },
+                    new List<string>()
+                    {
+                        "'HOA Monthly' must be greater than or equal to '0.00'."
                     }
                 };
             }

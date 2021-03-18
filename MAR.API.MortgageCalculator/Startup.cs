@@ -1,3 +1,4 @@
+using AspNetCoreRateLimit;
 using MAR.API.MortgageCalculator.Logic.Facade;
 using MAR.API.MortgageCalculator.Logic.Factories;
 using MAR.API.MortgageCalculator.Logic.Interfaces;
@@ -42,6 +43,9 @@ namespace MAR.API.MortgageCalculator
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddLocalization();
+            services.AddOptions();
+            services.AddMemoryCache();
+            services.AddHttpContextAccessor();
             services.Configure<RequestLocalizationOptions>(
                 options =>
                 {
@@ -61,9 +65,23 @@ namespace MAR.API.MortgageCalculator
                 var xmlFilePath = Path.Combine(System.AppContext.BaseDirectory, "MAR.API.MortgageCalculator.xml");
                 c.IncludeXmlComments(xmlFilePath);
             });
+            AddRateLimitingServices(services);
+            AddApiDomainServices(services);
+        }
+
+        private void AddApiDomainServices(IServiceCollection services)
+        {
             services.AddScoped<IHttpClientProvider, HttpClientProvider>();
             services.AddScoped<IMortgageCalculatorProviderFactory, MortgageCalculatorProviderFactory>();
             services.AddScoped<IMortgageCalculatorFacade, MortgageCalculatorFacade>();
+        }
+
+        private void AddRateLimitingServices(IServiceCollection services)
+        {
+            services.Configure<IpRateLimitOptions>(Configuration.GetSection("IpRateLimiting"));
+            services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
+            services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
+            services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
         }
 
         /// <summary>
@@ -73,6 +91,7 @@ namespace MAR.API.MortgageCalculator
         /// <param name="env"></param>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseIpRateLimiting();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
