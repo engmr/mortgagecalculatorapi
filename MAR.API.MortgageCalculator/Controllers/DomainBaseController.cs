@@ -32,40 +32,36 @@ namespace MAR.API.MortgageCalculator.Controllers
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        protected ApiResponse<object> GetApiResponse(object data)
+        {
+            return new ApiResponse<object>()
+            {
+                ResponseDateTime = DateTime.UtcNow,
+                APIVersion = GetApiVersion(),
+                ApplicationName = GetApplicationName(),
+                TransactionId = TransactionId,
+                Data = data
+            };
+        }
+
+        /// <summary>
+        /// Get ActionResult from a mortgage calculation result
+        /// </summary>
         /// <param name="result"></param>
         /// <returns></returns>
         protected IActionResult GetResultForMortageCalculation(IMortgageCalculationResult result)
         {
             if (result.IsSuccessful)
             {
-                return Ok(new ApiResponse<object>()
-                {
-                    ResponseDateTime = DateTime.UtcNow,
-                    APIVersion = GetApiVersion(),
-                    ApplicationName = GetApplicationName(),
-                    TransactionId = TransactionId,
-                    Data = result
-                });
+                return Ok(GetApiResponse(result));
             }
             if (result.ValidationErrors?.Any() == true)
             {
-                return StatusCode((int)HttpStatusCode.BadRequest, new ApiResponse<object>()
-                {
-                    ResponseDateTime = DateTime.UtcNow,
-                    APIVersion = GetApiVersion(),
-                    ApplicationName = GetApplicationName(),
-                    TransactionId = TransactionId,
-                    Data = result
-                });
+                return StatusCode((int)HttpStatusCode.BadRequest, GetApiResponse(result));
             }
-            return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<object>()
-            {
-                ResponseDateTime = DateTime.UtcNow,
-                APIVersion = GetApiVersion(),
-                ApplicationName = GetApplicationName(),
-                TransactionId = TransactionId,
-                Data = result
-            });
+            return StatusCode((int)HttpStatusCode.InternalServerError, GetApiResponse(result));
         }
 
         /// <summary>

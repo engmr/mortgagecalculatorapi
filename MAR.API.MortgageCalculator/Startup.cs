@@ -1,3 +1,4 @@
+using AspNetCoreRateLimit;
 using MAR.API.MortgageCalculator.Logic.Facade;
 using MAR.API.MortgageCalculator.Logic.Factories;
 using MAR.API.MortgageCalculator.Logic.Interfaces;
@@ -42,6 +43,7 @@ namespace MAR.API.MortgageCalculator
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddLocalization();
+            services.AddOptions();
             services.Configure<RequestLocalizationOptions>(
                 options =>
                 {
@@ -64,6 +66,15 @@ namespace MAR.API.MortgageCalculator
             services.AddScoped<IHttpClientProvider, HttpClientProvider>();
             services.AddScoped<IMortgageCalculatorProviderFactory, MortgageCalculatorProviderFactory>();
             services.AddScoped<IMortgageCalculatorFacade, MortgageCalculatorFacade>();
+
+            //rate limit
+            services.AddMemoryCache();
+            services.Configure<IpRateLimitOptions>(Configuration.GetSection("IpRateLimiting"));
+            services.Configure<IpRateLimitPolicies>(Configuration.GetSection("IpRateLimitPolicies"));
+            services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
+            services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
+            services.AddHttpContextAccessor();
+            services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
         }
 
         /// <summary>
@@ -94,6 +105,8 @@ namespace MAR.API.MortgageCalculator
             {
                 endpoints.MapControllers();
             });
+
+            app.UseIpRateLimiting();
         }
     }
 }
