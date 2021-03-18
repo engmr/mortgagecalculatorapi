@@ -97,7 +97,7 @@ namespace MAR.API.MortgageCalculator.Logic.Providers
         public ValidationResult ValidateRequest()
         {
             _logger.LogDebug($"{nameof(ValidateRequest)} is being executed");
-            var validator = new MortgageCalculationRequestValidator(_validationMessageLocalizer);
+            var validator = new MortgageCalculationRequestValidator();
             return validator.Validate(_request);
         }
 

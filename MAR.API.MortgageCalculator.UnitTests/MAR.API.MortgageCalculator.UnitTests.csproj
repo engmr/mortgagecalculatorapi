@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Controllers\**" />
+    <EmbeddedResource Remove="Controllers\**" />
+    <None Remove="Controllers\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
     <PackageReference Include="Moq" Version="4.16.1" />
@@ -25,10 +31,6 @@
     <ProjectReference Include="..\MAR.API.MortgageCalculator.Localization\MAR.API.MortgageCalculator.Localization.csproj" />
     <ProjectReference Include="..\MAR.API.MortgageCalculator.Logic\MAR.API.MortgageCalculator.Logic.csproj" />
     <ProjectReference Include="..\MAR.API.MortgageCalculator.Model\MAR.API.MortgageCalculator.Model.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\" />
   </ItemGroup>
 
 </Project>
