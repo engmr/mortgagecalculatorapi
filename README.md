@@ -1,6 +1,8 @@
 # mortgagecalculatorapi
 A simple .NET Core calculator web API for a mortgage.
 
+DISCLAIMER: This API is not meant to provide financial advice for those seeking a mortgage nor for commercial use.
+
 ## Prerequisites
 1. .NET Core 5.0 or later installed
 
@@ -19,8 +21,22 @@ This API has rate limiting (AspNetRateLimit) implemented with configuration in t
 ## Mortgage Calculation Flow Diagram
 ![Mortgage Calculation Flow Diagram](https://github.com/engmr/mortgagecalculatorapi/blob/master/MortgageCalcAPI_Calculation_Flow_Diagram.png?raw=true)
 
+## API Response
+All calls will return a response with this format:
+```
+{
+    "responseDateTime": "<UTC date time>",
+    "apiVersion": "<current API Version>",
+    "applicationName": "Mortgage Calculator API",
+    "transactionId": "<a Guid>",
+    "data": <null OR object>
+}
+```
+
 ## Sample Request/Response
-Version 1.0.2
+Version: 1.0.2  
+Route: POST /calculate/free  
+Content-Type: application/json
 
 ### Request
 ```
