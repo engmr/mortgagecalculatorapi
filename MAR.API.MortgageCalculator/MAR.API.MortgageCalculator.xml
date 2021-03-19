@@ -26,11 +26,75 @@
             <returns></returns>
             Add rate limiting to this later
         </member>
-        <member name="M:MAR.API.MortgageCalculator.Controllers.CalculateController.CalculateSecure(MAR.API.MortgageCalculator.Model.Requests.MortgageCalculationRequest)">
+        <member name="M:MAR.API.MortgageCalculator.Controllers.CalculateController.CalculatePaid(MAR.API.MortgageCalculator.Model.Requests.MortgageCalculationRequest)">
             <summary>
-            Calculate (secure)
+            Calculate (paid)
             </summary>
             <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="T:MAR.API.MortgageCalculator.Controllers.DomainBaseController">
+            <summary>
+            Shared logic amongst domain API controllers
+            </summary>
+        </member>
+        <member name="P:MAR.API.MortgageCalculator.Controllers.DomainBaseController.TransactionId">
+            <summary>
+            Domain API transaction id
+            </summary>
+        </member>
+        <member name="M:MAR.API.MortgageCalculator.Controllers.DomainBaseController.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:MAR.API.MortgageCalculator.Controllers.DomainBaseController.GetApiResponse(System.Object)">
+            <summary>
+            
+            </summary>
+            <param name="data"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MAR.API.MortgageCalculator.Controllers.DomainBaseController.GetResultForMortageCalculation(MAR.API.MortgageCalculator.Model.Interfaces.IMortgageCalculationResult)">
+            <summary>
+            Get ActionResult from a mortgage calculation result
+            </summary>
+            <param name="result"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MAR.API.MortgageCalculator.Controllers.DomainBaseController.GetTransactionLoggingScope">
+            <summary>
+            Get transction level logging scope
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:MAR.API.MortgageCalculator.Controllers.DomainBaseController.GetApiVersion">
+            <summary>
+            Gets API's version
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:MAR.API.MortgageCalculator.Controllers.DomainBaseController.GetApplicationName">
+            <summary>
+            Gets API user friendly application name
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:MAR.API.MortgageCalculator.Controllers.DomainBaseController.SetTransactionId">
+            <summary>
+            Gets API request transaction Id
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:MAR.API.MortgageCalculator.Controllers.HealthController">
+            <summary>
+            Health controller
+            </summary>
+        </member>
+        <member name="M:MAR.API.MortgageCalculator.Controllers.HealthController.HealthCheck">
+            <summary>
+            Health check endpoint
+            </summary>
             <returns></returns>
         </member>
         <member name="T:MAR.API.MortgageCalculator.Program">
