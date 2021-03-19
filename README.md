@@ -16,5 +16,5 @@ This API has Serilog as its logging provider and will output to the console (lim
 ## Rate Limiting
 This API has rate limiting (AspNetRateLimit) implemented with configuration in the appsettings.json file.
 
-## UML Diagram
-Coming soon...
+## Mortgage Calculation Flow Diagram
+![Mortgage Calculation Flow Diagram](https://github.com/engmr/mortgagecalculatorapi/blob/master/MortgageCalcAPI_Calculation_Flow_Diagram.png?raw=true)
