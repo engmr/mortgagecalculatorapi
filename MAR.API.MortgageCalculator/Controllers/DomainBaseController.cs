@@ -83,7 +83,7 @@ namespace MAR.API.MortgageCalculator.Controllers
         protected string GetApiVersion()
         {
             //return _apiVersionReader.Read(HttpContext.Request);
-            return "1.0.1";
+            return "1.0.2";
         }
 
         /// <summary>
