@@ -247,7 +247,7 @@ namespace MAR.API.MortgageCalculator.UnitTests.Services
                     },
                     new List<string>()
                     {
-                        "'Down Payment Percent' must be greater than '0.00'."
+                        "'Down Payment Percent' must be between 0.00 and 100 (exclusive). You entered 0.00."
                     }
                 };
                 yield return new object[]
@@ -256,7 +256,7 @@ namespace MAR.API.MortgageCalculator.UnitTests.Services
                     new MortgageCalculationRequest()
                     {
                         APR = 2.75M,
-                        DownPaymentPercent = 0.00M,
+                        DownPaymentPercent = -0.01M,
                         HOAMonthly = 0,
                         HomeownerInsuranceRate = 0.22M,
                         LoanTermYears = 30,
@@ -265,7 +265,43 @@ namespace MAR.API.MortgageCalculator.UnitTests.Services
                     },
                     new List<string>()
                     {
-                        "'Down Payment Percent' must be greater than '0.00'."
+                        "'Down Payment Percent' must be between 0.00 and 100 (exclusive). You entered -0.01."
+                    }
+                };
+                yield return new object[]
+                {
+                    "DownPaymentPercent validation failure, value is 100",
+                    new MortgageCalculationRequest()
+                    {
+                        APR = 2.75M,
+                        DownPaymentPercent = 100.00M,
+                        HOAMonthly = 0,
+                        HomeownerInsuranceRate = 0.22M,
+                        LoanTermYears = 30,
+                        PropertyTaxRate = 1.15M,
+                        PurchasePrice = 100000.00M
+                    },
+                    new List<string>()
+                    {
+                        "'Down Payment Percent' must be between 0.00 and 100 (exclusive). You entered 100.00."
+                    }
+                };
+                yield return new object[]
+                {
+                    "DownPaymentPercent validation failure, value is greater than 100",
+                    new MortgageCalculationRequest()
+                    {
+                        APR = 2.75M,
+                        DownPaymentPercent = 100.01M,
+                        HOAMonthly = 0,
+                        HomeownerInsuranceRate = 0.22M,
+                        LoanTermYears = 30,
+                        PropertyTaxRate = 1.15M,
+                        PurchasePrice = 100000.00M
+                    },
+                    new List<string>()
+                    {
+                        "'Down Payment Percent' must be between 0.00 and 100 (exclusive). You entered 100.01."
                     }
                 };
                 yield return new object[]
@@ -284,6 +320,150 @@ namespace MAR.API.MortgageCalculator.UnitTests.Services
                     new List<string>()
                     {
                         "'HOA Monthly' must be greater than or equal to '0.00'."
+                    }
+                };
+                yield return new object[]
+                {
+                    "HomeownerInsuranceRate validation failure, value is 0",
+                    new MortgageCalculationRequest()
+                    {
+                        APR = 2.75M,
+                        DownPaymentPercent = 20.00M,
+                        HOAMonthly = 0,
+                        HomeownerInsuranceRate = 0.00M,
+                        LoanTermYears = 30,
+                        PropertyTaxRate = 1.15M,
+                        PurchasePrice = 100000.00M
+                    },
+                    new List<string>()
+                    {
+                        "'Homeowner Insurance Rate' must be greater than '0.00'."
+                    }
+                };
+                yield return new object[]
+                {
+                    "HomeownerInsuranceRate validation failure, value is less than 0",
+                    new MortgageCalculationRequest()
+                    {
+                        APR = 2.75M,
+                        DownPaymentPercent = 20.00M,
+                        HOAMonthly = 0,
+                        HomeownerInsuranceRate = -0.01M,
+                        LoanTermYears = 30,
+                        PropertyTaxRate = 1.15M,
+                        PurchasePrice = 100000.00M
+                    },
+                    new List<string>()
+                    {
+                        "'Homeowner Insurance Rate' must be greater than '0.00'."
+                    }
+                };
+                yield return new object[]
+                {
+                    "LoanTermYears validation failure, value is 0",
+                    new MortgageCalculationRequest()
+                    {
+                        APR = 2.75M,
+                        DownPaymentPercent = 20.00M,
+                        HOAMonthly = 0,
+                        HomeownerInsuranceRate = 0.22M,
+                        LoanTermYears = 0,
+                        PropertyTaxRate = 1.15M,
+                        PurchasePrice = 100000.00M
+                    },
+                    new List<string>()
+                    {
+                        "'Loan Term Years' must be greater than '0'."
+                    }
+                };
+                yield return new object[]
+                {
+                    "LoanTermYears validation failure, value is less than 0",
+                    new MortgageCalculationRequest()
+                    {
+                        APR = 2.75M,
+                        DownPaymentPercent = 20.00M,
+                        HOAMonthly = 0,
+                        HomeownerInsuranceRate = 0.22M,
+                        LoanTermYears = -1,
+                        PropertyTaxRate = 1.15M,
+                        PurchasePrice = 100000.00M
+                    },
+                    new List<string>()
+                    {
+                        "'Loan Term Years' must be greater than '0'."
+                    }
+                };
+                yield return new object[]
+                {
+                    "PropertyTaxRate validation failure, value is 0",
+                    new MortgageCalculationRequest()
+                    {
+                        APR = 2.75M,
+                        DownPaymentPercent = 20.00M,
+                        HOAMonthly = 0,
+                        HomeownerInsuranceRate = 0.22M,
+                        LoanTermYears = 30,
+                        PropertyTaxRate = 0.00M,
+                        PurchasePrice = 100000.00M
+                    },
+                    new List<string>()
+                    {
+                        "'Property Tax Rate' must be greater than '0.00'."
+                    }
+                };
+                yield return new object[]
+                {
+                    "PropertyTaxRate validation failure, value is less than 0",
+                    new MortgageCalculationRequest()
+                    {
+                        APR = 2.75M,
+                        DownPaymentPercent = 20.00M,
+                        HOAMonthly = 0,
+                        HomeownerInsuranceRate = 0.22M,
+                        LoanTermYears = 30,
+                        PropertyTaxRate = -0.01M,
+                        PurchasePrice = 100000.00M
+                    },
+                    new List<string>()
+                    {
+                        "'Property Tax Rate' must be greater than '0.00'."
+                    }
+                };
+                yield return new object[]
+                {
+                    "PurchasePrice validation failure, value is 0",
+                    new MortgageCalculationRequest()
+                    {
+                        APR = 2.75M,
+                        DownPaymentPercent = 20.00M,
+                        HOAMonthly = 0,
+                        HomeownerInsuranceRate = 0.22M,
+                        LoanTermYears = 30,
+                        PropertyTaxRate = 1.15M,
+                        PurchasePrice = 0.00M
+                    },
+                    new List<string>()
+                    {
+                        "'Purchase Price' must be greater than '0.00'."
+                    }
+                };
+                yield return new object[]
+                {
+                    "PurchasePrice validation failure, value is less than 0",
+                    new MortgageCalculationRequest()
+                    {
+                        APR = 2.75M,
+                        DownPaymentPercent = 20.00M,
+                        HOAMonthly = 0,
+                        HomeownerInsuranceRate = 0.22M,
+                        LoanTermYears = 30,
+                        PropertyTaxRate = 1.15M,
+                        PurchasePrice = -0.01M
+                    },
+                    new List<string>()
+                    {
+                        "'Purchase Price' must be greater than '0.00'."
                     }
                 };
             }
