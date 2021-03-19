@@ -25,11 +25,12 @@ namespace MAR.API.MortgageCalculator
                 var webHost = CreateHostBuilder(args).Build();
                 using (var scope = webHost.Services.CreateScope())
                 {
+                    Log.Information("IP Policy store is being seeded...");
                     var ipPolicyStore = scope.ServiceProvider.GetRequiredService<IIpPolicyStore>();
                     await ipPolicyStore.SeedAsync();
                 }
-                webHost.Run();
                 Log.Information("Application is starting up...");
+                webHost.Run();
             }
             catch (Exception ex)
             {
