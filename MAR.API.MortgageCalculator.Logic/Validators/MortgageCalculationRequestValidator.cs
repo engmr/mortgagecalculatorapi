@@ -8,7 +8,7 @@ namespace MAR.API.MortgageCalculator.Logic.Validators
         public MortgageCalculationRequestValidator()
         {
             RuleFor(r => r.APR).GreaterThan(0.00M);
-            RuleFor(r => r.DownPaymentPercent).GreaterThan(0.00M);
+            RuleFor(r => r.DownPaymentPercent).ExclusiveBetween(0.00M, 100M);
             RuleFor(r => r.HOAMonthly).GreaterThanOrEqualTo(0.00M);
             RuleFor(r => r.HomeownerInsuranceRate).GreaterThan(0.00M);
             RuleFor(r => r.LoanTermYears).GreaterThan(0);
