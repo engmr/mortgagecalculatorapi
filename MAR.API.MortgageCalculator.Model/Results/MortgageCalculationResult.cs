@@ -8,15 +8,21 @@ namespace MAR.API.MortgageCalculator.Model.Results
 {
     public class MortgageCalculationResult : IMortgageCalculationResult
     {
-        public MortgageCalculationRequest Request { get; }
-        public List<string> Errors { get; }
-        public List<string> ValidationErrors { get; }
+        public MortgageCalculationRequest Request { get; set;  }
+        public List<string> Errors { get; set; }
+        public List<string> ValidationErrors { get; set; }
         public bool IsSuccessful { 
             get
             {
                 return (Errors == null ? true : !Errors.Any())
                     && (ValidationErrors == null ? true : !ValidationErrors.Any()); 
             } 
+        }
+
+        public MortgageCalculationResult()
+        {
+            ValidationErrors = new List<string>();
+            Errors = new List<string>();
         }
         public MortgageCalculationResult(MortgageCalculationRequest request)
         {

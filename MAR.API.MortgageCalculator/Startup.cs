@@ -1,16 +1,21 @@
 using AspNetCoreRateLimit;
+using MAR.API.MortgageCalculator.Interfaces;
 using MAR.API.MortgageCalculator.Logic.Facade;
 using MAR.API.MortgageCalculator.Logic.Factories;
 using MAR.API.MortgageCalculator.Logic.Interfaces;
 using MAR.API.MortgageCalculator.Logic.Providers;
+using MAR.API.MortgageCalculator.Providers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -44,8 +49,27 @@ namespace MAR.API.MortgageCalculator
         {
             services.AddLocalization();
             services.AddOptions();
+            ConfigureAppSettings(services);
             services.AddMemoryCache();
             services.AddHttpContextAccessor();
+            ConfigureLocalization(services);
+            services.AddControllers();
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "MAR.API.MortgageCalculator", Version = "v1" });
+                var xmlFilePath = Path.Combine(System.AppContext.BaseDirectory, "MAR.API.MortgageCalculator.xml");
+                c.IncludeXmlComments(xmlFilePath);
+            });
+            AddRateLimitingServices(services);
+            AddApiDomainServices(services);
+        }
+
+        private void ConfigureAppSettings(IServiceCollection services)
+        {
+            services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
+        }
+        private void ConfigureLocalization(IServiceCollection services)
+        {
             services.Configure<RequestLocalizationOptions>(
                 options =>
                 {
@@ -58,15 +82,6 @@ namespace MAR.API.MortgageCalculator
                     options.SupportedCultures = supportedCultures;
                     options.SupportedUICultures = supportedCultures;
                 });
-            services.AddControllers();
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "MAR.API.MortgageCalculator", Version = "v1" });
-                var xmlFilePath = Path.Combine(System.AppContext.BaseDirectory, "MAR.API.MortgageCalculator.xml");
-                c.IncludeXmlComments(xmlFilePath);
-            });
-            AddRateLimitingServices(services);
-            AddApiDomainServices(services);
         }
 
         private void AddApiDomainServices(IServiceCollection services)
@@ -74,6 +89,7 @@ namespace MAR.API.MortgageCalculator
             services.AddScoped<IHttpClientProvider, HttpClientProvider>();
             services.AddScoped<IMortgageCalculatorProviderFactory, MortgageCalculatorProviderFactory>();
             services.AddScoped<IMortgageCalculatorFacade, MortgageCalculatorFacade>();
+            services.AddSingleton<IAuthorizationProvider, AuthorizationProvider>();
         }
 
         private void AddRateLimitingServices(IServiceCollection services)
@@ -89,7 +105,12 @@ namespace MAR.API.MortgageCalculator
         /// </summary>
         /// <param name="app"></param>
         /// <param name="env"></param>
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        /// <param name="memoryCache"></param>
+        /// <param name="appSettings"></param>
+        public void Configure(IApplicationBuilder app, 
+            IWebHostEnvironment env, 
+            IMemoryCache memoryCache, 
+            IOptions<AppSettings> appSettings)
         {
             app.UseIpRateLimiting();
             if (env.IsDevelopment())
@@ -98,7 +119,7 @@ namespace MAR.API.MortgageCalculator
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "MAR.API.MortgageCalculator v1"));
             }
-
+            
             app.UseRequestLocalization();
 
             app.UseHttpsRedirection();
@@ -113,6 +134,16 @@ namespace MAR.API.MortgageCalculator
             {
                 endpoints.MapControllers();
             });
+
+            //setup memory cache users
+            var neverExpireOptions = new MemoryCacheEntryOptions()
+                .SetPriority(CacheItemPriority.NeverRemove);
+            if (appSettings.Value.PublicPaidAccessUserId != Guid.Empty
+                && !string.IsNullOrWhiteSpace(appSettings.Value.PublicPaidAccessUserPassword))
+            {
+                memoryCache.Set($"PAIDUSERS_CLIENTID_{appSettings.Value.PublicPaidAccessUserId}", appSettings.Value.PublicPaidAccessUserId, neverExpireOptions);
+                memoryCache.Set($"PAIDUSERS_CLIENTID_{appSettings.Value.PublicPaidAccessUserId}_PASSWORD", appSettings.Value.PublicPaidAccessUserPassword, neverExpireOptions);
+            }
         }
     }
 }
