@@ -1,7 +1,5 @@
 ﻿using MAR.API.MortgageCalculator.Interfaces;
 using MAR.API.MortgageCalculator.Localization;
-using MAR.API.MortgageCalculator.Logic.Interfaces;
-using MAR.API.MortgageCalculator.Model.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -13,17 +11,16 @@ using System.Threading.Tasks;
 namespace MAR.API.MortgageCalculator.Controllers
 {
     /// <summary>
-    /// Calculation controller
+    /// Authorization controller
     /// </summary>
     [Route("[controller]")]
     [ApiController]
-    public class CalculateController : DomainBaseController
+    public class AuthorizeController : DomainBaseController
     {
         private ILoggerFactory _loggerFactory;
-        private ILogger<CalculateController> _logger;
+        private ILogger<AuthorizeController> _logger;
         private IStringLocalizer<ErrorMessages> _errorMessagesLocalizer;
         private IStringLocalizer<ValidationMessages> _validationMessagesLocalizer;
-        private IMortgageCalculatorFacade _mortgageCalculatorFacade;
         private IAuthTokenProvider _authTokenProvider;
 
         /// <summary>
@@ -32,76 +29,50 @@ namespace MAR.API.MortgageCalculator.Controllers
         /// <param name="loggerFactory"></param>
         /// <param name="errorMessagesLocalizer"></param>
         /// <param name="validationMessagesLocalizer"></param>
-        /// <param name="mortgageCalculatorFacade"></param>
         /// <param name="authTokenProvider"></param>
         /// <param name="appSettings"></param>
-        public CalculateController(ILoggerFactory loggerFactory,
+        public AuthorizeController(ILoggerFactory loggerFactory,
             IStringLocalizer<ErrorMessages> errorMessagesLocalizer,
             IStringLocalizer<ValidationMessages> validationMessagesLocalizer,
-            IMortgageCalculatorFacade mortgageCalculatorFacade,
             IAuthTokenProvider authTokenProvider,
             IOptions<AppSettings> appSettings)
             : base(loggerFactory, authTokenProvider, appSettings)
         {
             _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
-            _logger = _loggerFactory.CreateLogger<CalculateController>();
+            _logger = _loggerFactory.CreateLogger<AuthorizeController>();
             _errorMessagesLocalizer = errorMessagesLocalizer ?? throw new ArgumentNullException(nameof(errorMessagesLocalizer));
             _validationMessagesLocalizer = validationMessagesLocalizer ?? throw new ArgumentNullException(nameof(validationMessagesLocalizer));
-            _mortgageCalculatorFacade = mortgageCalculatorFacade ?? throw new ArgumentNullException(nameof(mortgageCalculatorFacade));
             _authTokenProvider = authTokenProvider ?? throw new ArgumentNullException(nameof(authTokenProvider));
         }
 
         /// <summary>
         /// Calculate (free)
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="authHeaders"></param>
         /// <returns></returns>
         [AllowAnonymous]
-        [Route("free")]
+        [Route("issuetoken")]
         [Produces("application/json")]
         [HttpPost]
-        public async Task<IActionResult> Calculate([FromBody] MortgageCalculationRequest request)
+        public async Task<IActionResult> IssueToken([FromHeader] AuthorizationHeaders authHeaders)
         {
             using (_logger.BeginScope(GetTransactionLoggingScope()))
             {
-                _logger.LogInformation($"{nameof(Calculate)}" + " called with request {@request}");
-                return await Task.Run(() =>
-                {
-                    var result = _mortgageCalculatorFacade.GetMortgageCalculation(request);
-                    return GetResultForMortageCalculation(result);
-                });
-            }
-        }
-
-        /// <summary>
-        /// Calculate (paid)
-        /// </summary>
-        /// <param name="authHeaders"></param>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        //[Authorize]
-        [Produces("application/json")]
-        [HttpPost]
-        public async Task<IActionResult> CalculatePaid([FromHeader] AuthorizationHeaders authHeaders, [FromBody] MortgageCalculationRequest request)
-        {
-            using (_logger.BeginScope(GetTransactionLoggingScope()))
-            {
-                _logger.LogInformation($"{nameof(CalculatePaid)}" + " called with request {@request}");
-                if (!CheckAuthorizationHeadersForClientAndToken(authHeaders))
+                _logger.LogDebug($"{nameof(IssueToken)}" + " called");
+                if (!CheckAuthorizationHeadersForCredentials(authHeaders))
                 {
                     return GetFailedAuthorizationResponse();
                 }
 
-                if (_authTokenProvider.IsTokenStillValid(authHeaders.ClientId, authHeaders.AuthorizationToken))
+                return await Task.Run(() =>
                 {
-                    return await Task.Run(() =>
+                    var issuedToken = _authTokenProvider.VerifyIsPaidUserAndIssueToken(authHeaders.ClientId, authHeaders.Password, out string token);
+                    if (issuedToken)
                     {
-                        var result = _mortgageCalculatorFacade.GetMortgageCalculation(request);
-                        return GetResultForMortageCalculation(result);
-                    });
-                }
-
-                return GetUnauthorizedResponse();
+                        return Ok(GetApiResponse(token));
+                    }
+                    return GetFailedAuthorizationResponse();
+                });
             }
         }
     }

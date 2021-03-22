@@ -1,6 +1,9 @@
-﻿using MAR.API.MortgageCalculator.Model.Dto;
+﻿using MAR.API.MortgageCalculator.Interfaces;
+using MAR.API.MortgageCalculator.Model.Dto;
 using MAR.API.MortgageCalculator.Model.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +16,11 @@ namespace MAR.API.MortgageCalculator.Controllers
     /// </summary>
     public class DomainBaseController : ControllerBase
     {
+        private ILoggerFactory _loggerFactory;
+        private ILogger<DomainBaseController> _logger;
+        private IAuthTokenProvider _authTokenProvider;
+        private IOptions<AppSettings> _appSettings;
+
         private Guid _transactionId;
         /// <summary>
         /// Domain API transaction id
@@ -24,13 +32,68 @@ namespace MAR.API.MortgageCalculator.Controllers
         /// <summary>
         /// Constructor
         /// </summary>
-        public DomainBaseController()
+        public DomainBaseController(ILoggerFactory loggerFactory, IAuthTokenProvider authTokenProvider, IOptions<AppSettings> appSettings)
         {
             SetTransactionId();
+            _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
+            _logger = _loggerFactory.CreateLogger<DomainBaseController>();
+            _authTokenProvider = authTokenProvider ?? throw new ArgumentNullException(nameof(authTokenProvider));
+            _appSettings = appSettings ?? throw new ArgumentNullException(nameof(appSettings));
         }
 
         /// <summary>
-        /// 
+        /// Checks auth headers to see if credentials were provided
+        /// </summary>
+        /// <param name="authHeaders"></param>
+        /// <returns>true if credentials are present</returns>
+        protected bool CheckAuthorizationHeadersForCredentials(AuthorizationHeaders authHeaders)
+        {
+            if (authHeaders == null)
+            {
+                _logger.LogError("No authorization headers received");
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(authHeaders.ClientId)
+                || string.IsNullOrWhiteSpace(authHeaders.Password))
+            {
+                _logger.LogError("No authorization token received");
+                return false;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Checks auth headers to see if auth token was provided
+        /// </summary>
+        /// <param name="authHeaders"></param>
+        /// <returns>true if token is present</returns>
+        protected bool CheckAuthorizationHeadersForClientAndToken(AuthorizationHeaders authHeaders)
+        {
+            if (authHeaders == null)
+            {
+                _logger.LogError("No authorization headers received");
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(authHeaders.AuthorizationToken))
+            {
+                _logger.LogError("No authorization token received");
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(authHeaders.ClientId))
+            {
+                _logger.LogError("No client id received");
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Get ApiResponse object
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
@@ -44,6 +107,24 @@ namespace MAR.API.MortgageCalculator.Controllers
                 TransactionId = TransactionId,
                 Data = data
             };
+        }
+
+        /// <summary>
+        /// Gets general failed auth result
+        /// </summary>
+        /// <returns></returns>
+        protected IActionResult GetFailedAuthorizationResponse()
+        {
+            return StatusCode((int)HttpStatusCode.BadRequest, GetApiResponse(null));
+        }
+
+        /// <summary>
+        /// Gets unauthorized result
+        /// </summary>
+        /// <returns></returns>
+        protected IActionResult GetUnauthorizedResponse()
+        {
+            return StatusCode((int)HttpStatusCode.Unauthorized, GetApiResponse(null));
         }
 
         /// <summary>
@@ -83,7 +164,7 @@ namespace MAR.API.MortgageCalculator.Controllers
         protected string GetApiVersion()
         {
             //return _apiVersionReader.Read(HttpContext.Request);
-            return "1.0.2";
+            return "1.0.3";
         }
 
         /// <summary>
@@ -92,8 +173,7 @@ namespace MAR.API.MortgageCalculator.Controllers
         /// <returns></returns>
         protected string GetApplicationName()
         {
-            //return _appSettings.ApplicationName;
-            return "Mortgage Calculator API";
+            return _appSettings.Value.ApplicationName;
         }
 
         /// <summary>
