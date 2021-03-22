@@ -80,7 +80,7 @@ This API has Serilog as its logging provider and will output to the console (lim
 This API has rate limiting (AspNetRateLimit) implemented with configuration in the appsettings.json file.
 
 ## User Secrets
-This API uses User Secrets. Right-click on the MAR.API.MortgageCalculator and select "Manage User Secrets".  
+This API uses User Secrets. Right-click on the MAR.API.MortgageCalculator .csproj and select "Manage User Secrets".  
   
 This will create (if first time ever) / open the secrets.json file for you to add overrides for the appsettings.json file.  
 > e.g. AppSettings:PublicPaidAccessUserId
@@ -99,8 +99,8 @@ Some endpoints will require authorization. In the absence of a dedicated authori
 ### Issuing an AuthorizationToken
 Route: POST /authorize/token/issue  
 Headers:  
-  - ClientId: <guid>
-  - Password: <string>
+  - ClientId (Guid)
+  - Password (string)
 #### Token Issued Successfully Response
 ```
 {
@@ -117,8 +117,8 @@ NOTE: As of API version 1.0.3, only one user will exist in the authorization dom
 
 ### Passing an AuthorizationToken to an Endpoint
 Required Headers:
-  - ClientId: <guid>
-  - AuthorizationToken: <string>
+  - ClientId (guid)
+  - AuthorizationToken (string)
 
 ## Mortgage Calculation Flow Diagram
 ![Mortgage Calculation Flow Diagram](https://github.com/engmr/mortgagecalculatorapi/blob/master/MortgageCalcAPI_Calculation_Flow_Diagram.png?raw=true)
