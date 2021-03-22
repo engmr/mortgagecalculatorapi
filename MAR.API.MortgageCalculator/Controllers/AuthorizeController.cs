@@ -83,7 +83,7 @@ namespace MAR.API.MortgageCalculator.Controllers
         /// <returns></returns>
         [Route("token/isvalid")]
         [Produces("application/json")]
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> IsTokenStillValid([FromHeader] AuthorizationHeaders authHeaders)
         {
             using (_logger.BeginScope(GetTransactionLoggingScope()))

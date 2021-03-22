@@ -49,9 +49,27 @@ namespace MAR.API.MortgageCalculator
         {
             services.AddLocalization();
             services.AddOptions();
-            services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
+            ConfigureAppSettings(services);
             services.AddMemoryCache();
             services.AddHttpContextAccessor();
+            ConfigureLocalization(services);
+            services.AddControllers();
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "MAR.API.MortgageCalculator", Version = "v1" });
+                var xmlFilePath = Path.Combine(System.AppContext.BaseDirectory, "MAR.API.MortgageCalculator.xml");
+                c.IncludeXmlComments(xmlFilePath);
+            });
+            AddRateLimitingServices(services);
+            AddApiDomainServices(services);
+        }
+
+        private void ConfigureAppSettings(IServiceCollection services)
+        {
+            services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
+        }
+        private void ConfigureLocalization(IServiceCollection services)
+        {
             services.Configure<RequestLocalizationOptions>(
                 options =>
                 {
@@ -64,15 +82,6 @@ namespace MAR.API.MortgageCalculator
                     options.SupportedCultures = supportedCultures;
                     options.SupportedUICultures = supportedCultures;
                 });
-            services.AddControllers();
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "MAR.API.MortgageCalculator", Version = "v1" });
-                var xmlFilePath = Path.Combine(System.AppContext.BaseDirectory, "MAR.API.MortgageCalculator.xml");
-                c.IncludeXmlComments(xmlFilePath);
-            });
-            AddRateLimitingServices(services);
-            AddApiDomainServices(services);
         }
 
         private void AddApiDomainServices(IServiceCollection services)
