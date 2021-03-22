@@ -1,7 +1,7 @@
 # mortgagecalculatorapi
 A simple .NET Core calculator web API for a mortgage.
 
-DISCLAIMER: This API is not meant to provide financial advice for those seeking a mortgage nor for commercial use.
+DISCLAIMER: This API is not meant to provide financial advice for those seeking a mortgage nor be for commercial use.
 
 ## Prerequisites
 1. .NET Core 5.0 or later installed
@@ -24,12 +24,12 @@ All calls (non-429 code) will return a response body with this format:
 }
 ```
 
-## Sample API Request/Response
+### Sample API Request/Response
 Version: 1.0.2  
 Route: POST /calculate/free  
 Content-Type: application/json
 
-### Request
+#### Request
 ```
 {
   "purchasePrice": 100000,
@@ -41,7 +41,7 @@ Content-Type: application/json
   "hoaMonthly": 10
 }
 ```
-### Response
+#### Response
 ```
 {
     "responseDateTime": "2021-03-19T23:38:03.8564816Z",
