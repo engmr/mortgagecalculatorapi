@@ -3,17 +3,22 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MAR.API.MortgageCalculator", "MAR.API.MortgageCalculator\MAR.API.MortgageCalculator.csproj", "{F9EFE4F7-650B-41AA-8D2F-D7B67E7BBA8B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MAR.API.MortgageCalculator", "MAR.API.MortgageCalculator\MAR.API.MortgageCalculator.csproj", "{F9EFE4F7-650B-41AA-8D2F-D7B67E7BBA8B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MAR.API.MortgageCalculator.Model", "MAR.API.MortgageCalculator.Model\MAR.API.MortgageCalculator.Model.csproj", "{A2FFD406-8B0A-4172-82F6-8A0BBEBE59D9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MAR.API.MortgageCalculator.Model", "MAR.API.MortgageCalculator.Model\MAR.API.MortgageCalculator.Model.csproj", "{A2FFD406-8B0A-4172-82F6-8A0BBEBE59D9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{520A685B-6BB3-4DE2-88D1-715A22858987}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MAR.API.MortgageCalculator.UnitTests", "MAR.API.MortgageCalculator.UnitTests\MAR.API.MortgageCalculator.UnitTests.csproj", "{439F1822-1441-46A4-9120-A2F175417FF8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MAR.API.MortgageCalculator.UnitTests", "MAR.API.MortgageCalculator.UnitTests\MAR.API.MortgageCalculator.UnitTests.csproj", "{439F1822-1441-46A4-9120-A2F175417FF8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MAR.API.MortgageCalculator.Logic", "MAR.API.MortgageCalculator.Logic\MAR.API.MortgageCalculator.Logic.csproj", "{B0D613B9-13C5-4373-9524-98CAF7680055}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MAR.API.MortgageCalculator.Logic", "MAR.API.MortgageCalculator.Logic\MAR.API.MortgageCalculator.Logic.csproj", "{B0D613B9-13C5-4373-9524-98CAF7680055}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MAR.API.MortgageCalculator.Localization", "MAR.API.MortgageCalculator.Localization\MAR.API.MortgageCalculator.Localization.csproj", "{5EEF89ED-9863-4A2E-B5EB-DDF06997B5F6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MAR.API.MortgageCalculator.Localization", "MAR.API.MortgageCalculator.Localization\MAR.API.MortgageCalculator.Localization.csproj", "{5EEF89ED-9863-4A2E-B5EB-DDF06997B5F6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{89BC2B40-36DD-4CB4-8A22-94965A244A20}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
