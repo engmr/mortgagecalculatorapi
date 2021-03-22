@@ -22,7 +22,7 @@ namespace MAR.API.MortgageCalculator.Controllers
         /// <param name="authTokenProvider"></param>
         /// <param name="appSettings"></param>
         public HealthController(ILoggerFactory loggerFactory,
-            IAuthTokenProvider authTokenProvider,
+            IAuthorizationProvider authTokenProvider,
             IOptions<AppSettings> appSettings)
             : base(loggerFactory, authTokenProvider, appSettings)
         {

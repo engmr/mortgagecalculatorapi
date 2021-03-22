@@ -80,7 +80,7 @@ namespace MAR.API.MortgageCalculator
             services.AddScoped<IHttpClientProvider, HttpClientProvider>();
             services.AddScoped<IMortgageCalculatorProviderFactory, MortgageCalculatorProviderFactory>();
             services.AddScoped<IMortgageCalculatorFacade, MortgageCalculatorFacade>();
-            services.AddSingleton<IAuthTokenProvider, AuthTokenProvider>();
+            services.AddSingleton<IAuthorizationProvider, AuthorizationProvider>();
         }
 
         private void AddRateLimitingServices(IServiceCollection services)

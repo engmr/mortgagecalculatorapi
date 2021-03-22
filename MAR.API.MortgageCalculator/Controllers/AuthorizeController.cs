@@ -21,7 +21,7 @@ namespace MAR.API.MortgageCalculator.Controllers
         private ILogger<AuthorizeController> _logger;
         private IStringLocalizer<ErrorMessages> _errorMessagesLocalizer;
         private IStringLocalizer<ValidationMessages> _validationMessagesLocalizer;
-        private IAuthTokenProvider _authTokenProvider;
+        private IAuthorizationProvider _authorizationProvider;
 
         /// <summary>
         /// Constructor
@@ -29,29 +29,29 @@ namespace MAR.API.MortgageCalculator.Controllers
         /// <param name="loggerFactory"></param>
         /// <param name="errorMessagesLocalizer"></param>
         /// <param name="validationMessagesLocalizer"></param>
-        /// <param name="authTokenProvider"></param>
+        /// <param name="authorizationProvider"></param>
         /// <param name="appSettings"></param>
         public AuthorizeController(ILoggerFactory loggerFactory,
             IStringLocalizer<ErrorMessages> errorMessagesLocalizer,
             IStringLocalizer<ValidationMessages> validationMessagesLocalizer,
-            IAuthTokenProvider authTokenProvider,
+            IAuthorizationProvider authorizationProvider,
             IOptions<AppSettings> appSettings)
-            : base(loggerFactory, authTokenProvider, appSettings)
+            : base(loggerFactory, authorizationProvider, appSettings)
         {
             _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
             _logger = _loggerFactory.CreateLogger<AuthorizeController>();
             _errorMessagesLocalizer = errorMessagesLocalizer ?? throw new ArgumentNullException(nameof(errorMessagesLocalizer));
             _validationMessagesLocalizer = validationMessagesLocalizer ?? throw new ArgumentNullException(nameof(validationMessagesLocalizer));
-            _authTokenProvider = authTokenProvider ?? throw new ArgumentNullException(nameof(authTokenProvider));
+            _authorizationProvider = authorizationProvider ?? throw new ArgumentNullException(nameof(authorizationProvider));
         }
 
         /// <summary>
-        /// Calculate (free)
+        /// Issue token
         /// </summary>
         /// <param name="authHeaders"></param>
         /// <returns></returns>
         [AllowAnonymous]
-        [Route("issuetoken")]
+        [Route("token/issue")]
         [Produces("application/json")]
         [HttpPost]
         public async Task<IActionResult> IssueToken([FromHeader] AuthorizationHeaders authHeaders)
@@ -61,17 +61,43 @@ namespace MAR.API.MortgageCalculator.Controllers
                 _logger.LogDebug($"{nameof(IssueToken)}" + " called");
                 if (!CheckAuthorizationHeadersForCredentials(authHeaders))
                 {
-                    return GetFailedAuthorizationResponse();
+                    return GetBadRequestResponse();
                 }
 
                 return await Task.Run(() =>
                 {
-                    var issuedToken = _authTokenProvider.VerifyIsPaidUserAndIssueToken(authHeaders.ClientId, authHeaders.Password, out string token);
+                    var issuedToken = _authorizationProvider.VerifyIsPaidUserAndIssueToken(authHeaders.ClientId, authHeaders.Password, out string token);
                     if (issuedToken)
                     {
                         return Ok(GetApiResponse(token));
                     }
-                    return GetFailedAuthorizationResponse();
+                    return GetUnauthorizedResponse();
+                });
+            }
+        }
+
+        /// <summary>
+        /// Check if token is still valid
+        /// </summary>
+        /// <param name="authHeaders"></param>
+        /// <returns></returns>
+        [Route("token/isvalid")]
+        [Produces("application/json")]
+        [HttpPost]
+        public async Task<IActionResult> IsTokenStillValid([FromHeader] AuthorizationHeaders authHeaders)
+        {
+            using (_logger.BeginScope(GetTransactionLoggingScope()))
+            {
+                _logger.LogDebug($"{nameof(IsTokenStillValid)}" + " called");
+                if (!CheckAuthorizationHeadersForClientAndToken(authHeaders))
+                {
+                    return GetBadRequestResponse();
+                }
+
+                return await Task.Run(() =>
+                {
+                    var tokenIsStillValid = _authorizationProvider.IsTokenStillValid(authHeaders.ClientId, authHeaders.AuthorizationToken);
+                    return Ok(GetApiResponse(tokenIsStillValid));
                 });
             }
         }

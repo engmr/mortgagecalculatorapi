@@ -8,6 +8,10 @@ namespace MAR.API.MortgageCalculator
     public class AppSettings
     {
         /// <summary>
+        /// Application's api version
+        /// </summary>
+        public string ApiVersion { get; set; }
+        /// <summary>
         /// User friendly application name
         /// </summary>
         public string ApplicationName { get; set; }

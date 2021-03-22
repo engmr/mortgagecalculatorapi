@@ -3,7 +3,7 @@
     /// <summary>
     /// Authorization token provider interface
     /// </summary>
-    public interface IAuthTokenProvider
+    public interface IAuthorizationProvider
     {
         /// <summary>
         /// Expires authorization token

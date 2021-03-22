@@ -24,7 +24,7 @@ namespace MAR.API.MortgageCalculator.Controllers
         private IStringLocalizer<ErrorMessages> _errorMessagesLocalizer;
         private IStringLocalizer<ValidationMessages> _validationMessagesLocalizer;
         private IMortgageCalculatorFacade _mortgageCalculatorFacade;
-        private IAuthTokenProvider _authTokenProvider;
+        private IAuthorizationProvider _authorizationProvider;
 
         /// <summary>
         /// Constructor
@@ -33,22 +33,22 @@ namespace MAR.API.MortgageCalculator.Controllers
         /// <param name="errorMessagesLocalizer"></param>
         /// <param name="validationMessagesLocalizer"></param>
         /// <param name="mortgageCalculatorFacade"></param>
-        /// <param name="authTokenProvider"></param>
+        /// <param name="authorizationProvider"></param>
         /// <param name="appSettings"></param>
         public CalculateController(ILoggerFactory loggerFactory,
             IStringLocalizer<ErrorMessages> errorMessagesLocalizer,
             IStringLocalizer<ValidationMessages> validationMessagesLocalizer,
             IMortgageCalculatorFacade mortgageCalculatorFacade,
-            IAuthTokenProvider authTokenProvider,
+            IAuthorizationProvider authorizationProvider,
             IOptions<AppSettings> appSettings)
-            : base(loggerFactory, authTokenProvider, appSettings)
+            : base(loggerFactory, authorizationProvider, appSettings)
         {
             _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
             _logger = _loggerFactory.CreateLogger<CalculateController>();
             _errorMessagesLocalizer = errorMessagesLocalizer ?? throw new ArgumentNullException(nameof(errorMessagesLocalizer));
             _validationMessagesLocalizer = validationMessagesLocalizer ?? throw new ArgumentNullException(nameof(validationMessagesLocalizer));
             _mortgageCalculatorFacade = mortgageCalculatorFacade ?? throw new ArgumentNullException(nameof(mortgageCalculatorFacade));
-            _authTokenProvider = authTokenProvider ?? throw new ArgumentNullException(nameof(authTokenProvider));
+            _authorizationProvider = authorizationProvider ?? throw new ArgumentNullException(nameof(authorizationProvider));
         }
 
         /// <summary>
@@ -89,10 +89,10 @@ namespace MAR.API.MortgageCalculator.Controllers
                 _logger.LogInformation($"{nameof(CalculatePaid)}" + " called with request {@request}");
                 if (!CheckAuthorizationHeadersForClientAndToken(authHeaders))
                 {
-                    return GetFailedAuthorizationResponse();
+                    return GetBadRequestResponse();
                 }
 
-                if (_authTokenProvider.IsTokenStillValid(authHeaders.ClientId, authHeaders.AuthorizationToken))
+                if (_authorizationProvider.IsTokenStillValid(authHeaders.ClientId, authHeaders.AuthorizationToken))
                 {
                     return await Task.Run(() =>
                     {

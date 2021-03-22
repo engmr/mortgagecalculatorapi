@@ -10,10 +10,10 @@ namespace MAR.API.MortgageCalculator.Providers
     /// Authorization token provider. This type of implementation only works for distributed systems if using distributed mem caching.
     /// Normally, you would want a dedicated microservice to handle authorization tokens and expiration.
     /// </summary>
-    public class AuthTokenProvider : IAuthTokenProvider
+    public class AuthorizationProvider : IAuthorizationProvider
     {
         private ILoggerFactory _loggerFactory;
-        private ILogger<AuthTokenProvider> _logger;
+        private ILogger<AuthorizationProvider> _logger;
         private IMemoryCache _memoryCache;
         private IOptions<AppSettings> _appSettings;
 
@@ -29,10 +29,10 @@ namespace MAR.API.MortgageCalculator.Providers
         /// <param name="loggerFactory"></param>
         /// <param name="memoryCache"></param>
         /// <param name="appSettings"></param>
-        public AuthTokenProvider(ILoggerFactory loggerFactory, IMemoryCache memoryCache, IOptions<AppSettings> appSettings)
+        public AuthorizationProvider(ILoggerFactory loggerFactory, IMemoryCache memoryCache, IOptions<AppSettings> appSettings)
         {
             _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
-            _logger = loggerFactory.CreateLogger<AuthTokenProvider>();
+            _logger = loggerFactory.CreateLogger<AuthorizationProvider>();
             _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
             _appSettings = appSettings ?? throw new ArgumentNullException(nameof(appSettings));
 

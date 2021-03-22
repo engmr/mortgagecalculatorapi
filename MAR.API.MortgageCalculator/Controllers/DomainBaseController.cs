@@ -18,7 +18,7 @@ namespace MAR.API.MortgageCalculator.Controllers
     {
         private ILoggerFactory _loggerFactory;
         private ILogger<DomainBaseController> _logger;
-        private IAuthTokenProvider _authTokenProvider;
+        private IAuthorizationProvider _authorizationProvider;
         private IOptions<AppSettings> _appSettings;
 
         private Guid _transactionId;
@@ -32,12 +32,12 @@ namespace MAR.API.MortgageCalculator.Controllers
         /// <summary>
         /// Constructor
         /// </summary>
-        public DomainBaseController(ILoggerFactory loggerFactory, IAuthTokenProvider authTokenProvider, IOptions<AppSettings> appSettings)
+        public DomainBaseController(ILoggerFactory loggerFactory, IAuthorizationProvider authorizationProvider, IOptions<AppSettings> appSettings)
         {
             SetTransactionId();
             _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
             _logger = _loggerFactory.CreateLogger<DomainBaseController>();
-            _authTokenProvider = authTokenProvider ?? throw new ArgumentNullException(nameof(authTokenProvider));
+            _authorizationProvider = authorizationProvider ?? throw new ArgumentNullException(nameof(authorizationProvider));
             _appSettings = appSettings ?? throw new ArgumentNullException(nameof(appSettings));
         }
 
@@ -61,7 +61,7 @@ namespace MAR.API.MortgageCalculator.Controllers
                 return false;
             }
 
-            return false;
+            return true;
         }
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace MAR.API.MortgageCalculator.Controllers
         /// Gets general failed auth result
         /// </summary>
         /// <returns></returns>
-        protected IActionResult GetFailedAuthorizationResponse()
+        protected IActionResult GetBadRequestResponse()
         {
             return StatusCode((int)HttpStatusCode.BadRequest, GetApiResponse(null));
         }
@@ -163,8 +163,7 @@ namespace MAR.API.MortgageCalculator.Controllers
         /// <returns></returns>
         protected string GetApiVersion()
         {
-            //return _apiVersionReader.Read(HttpContext.Request);
-            return "1.0.3";
+            return _appSettings.Value.ApiVersion;
         }
 
         /// <summary>
