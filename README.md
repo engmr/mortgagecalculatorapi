@@ -107,13 +107,19 @@ $BuildMortgageCalculatorAPIDockerImage =
 ```
 
 ### Sample DockerEnv.txt
-The DockerEnv.txt file in the sln directory is a sample. You can edit and save since it is not tracked in source control. This file is passed into the `docker run` command for use by the API.
+The `--env-file` text file will contain the environment variables the application needs to run (e.g. AppSettings overrides). Placing a file of exact name 'DockerEnv.txt' in the sln directory can be done since it is not tracked in source control. This file can then be passed into the `docker run` command for use by the API.
+  
+```
+#Environment AppSettings Variables
+AppSettings__PublicPaidAccessUserId=00000000-0000-0000-0000-000000000000
+AppSettings__PublicPaidAccessUserPassword=yourPasswordHere
+```
 
 ### PowerShell ScriptBlock to Run the Image in the 'MortgageCalculatorAPI' Container
 ```
 $RunMortgageCalculatorAPIDockerContainer =
 {
-	$dockerEnvFile = Join-Path -Path $MortgageCalculatorAPISourceDir -ChildPath "DockerEnv.txt"
+	$dockerEnvFile = Join-Path -Path $MortgageCalculatorAPISlnDir -ChildPath "DockerEnv.txt"
 	docker run -d -p 8080:5000 --env-file=$dockerEnvFile --name "MortgageCalculatorAPI" mortgagecalculatorapi
 	docker ps
 }
