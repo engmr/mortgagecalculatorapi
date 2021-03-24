@@ -93,6 +93,34 @@ This will create (if first time ever) / open the secrets.json file for you to ad
 }
 ```
 
+## Docker
+This API has been setup to use Docker for creating an image for use in a container.
+
+### PowerShell ScriptBlock to Build the Image
+```
+$BuildMortgageCalculatorAPIDockerImage =
+{
+	cd $MortgageCalculatorAPISourceDir
+	docker build -t mortgagecalculatorapi -f Dockerfile .
+	docker images
+}
+```
+
+### Sample DockerEnv.txt
+The DockerEnv.txt file in the sln directory is a sample. You can edit and save since it is not tracked in source control. This file is passed into the `docker run` command for use by the API.
+
+### PowerShell ScriptBlock to Run the Image in the 'MortgageCalculatorAPI' Container
+```
+$RunMortgageCalculatorAPIDockerContainer =
+{
+	$dockerEnvFile = Join-Path -Path $MortgageCalculatorAPISourceDir -ChildPath "DockerEnv.txt"
+	docker run -d -p 8080:5000 --env-file=$dockerEnvFile --name "MortgageCalculatorAPI" mortgagecalculatorapi
+	docker ps
+}
+```
+  
+After the container is running, navigate to http://localhost:8080/health/check to verify it is running properly. The https:// protocol is not being used at this time (v 1.0.3).
+
 ## Authorization
 Some endpoints will require authorization. In the absence of a dedicated authorization service, the API has an AuthorizeController to handle issuing a token for use on its endpoints that require authorization.
   
