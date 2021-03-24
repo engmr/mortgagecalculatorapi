@@ -1,0 +1,10 @@
+**/bin
+**/obj
+**/out
+**/.vscode
+**/.vs
+**/.git
+**/.github
+.dotnet
+.Microsoft.DotNet.ImageBuilder
+DockerEnv.txt
