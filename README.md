@@ -4,8 +4,26 @@ A simple .NET Core calculator web API for a mortgage.
 DISCLAIMER: This API is not meant to provide financial advice for those seeking a mortgage nor be for commercial use.
 
 ## Prerequisites
-1. .NET Core 5.0 or later installed
+1. .NET 5.0 or later installed
+2. HTTPS self-signed certficate (localhost)
+```
+# If you already have a self-signed cert on your machine and want to nuke it...
+dotnet dev-certs https --clean
 
+# enable self-signed Https cert on machine (replace %userprofile% with $env:USERPROFILE in PowerShell)
+dotnet dev-certs https -ep %userprofile%\.aspnet\https\aspnetapp.pfx -p yourPasswordHere
+dotnet dev-certs https --trust
+```
+
+## Running the API locally
+
+### Option 1 - Publish into Docker
+See Docker section
+
+### Option 2 - IIS Express
+Debug using Visual Studio
+
+### Option 3 - Local Windows Process
 After building at least once, to run the API locally:
 ```
 cd <yourGitFolderWhereSlnIsAt>/MAR.API.MortgageCalculator
@@ -89,21 +107,38 @@ This will create (if first time ever) / open the secrets.json file for you to ad
 ```
 {
     "AppSettings:PublicPaidAccessUserId": "5db365cb-0bf2-4cad-8245-b56988078a3b",
-    "AppSettings:PublicPaidAccessUserPassword": "yourCoolSecretPassword"
+    "AppSettings:PublicPaidAccessUserPassword": "yourCoolSecretPassword",
+    "IpRateLimiting:ClientWhiteList:0": "MyIdHere"
 }
 ```
 
 ## Docker
 This API has been setup to use Docker for creating an image for use in a container.
 
-### PowerShell ScriptBlock to Build the Image
+### PowerShell ScriptBlocks
+
+#### Build Image
 ```
 $BuildMortgageCalculatorAPIDockerImage =
 {
 	cd $MortgageCalculatorAPISourceDir
-	docker build -t mortgagecalculatorapi -f Dockerfile .
+	docker build -t $MortgageCalculatorAPIImageName -f Dockerfile .
 	docker images
 }
+# where $MortgageCalculatorAPIImageName is the image name (e.g. mycoolapi)
+```
+
+#### Run Image
+```
+$RunMortgageCalculatorAPIDockerImage =
+{
+	docker run -d -p 8080:5000 -p 8081:5001 --env-file=$MortgageCalculatorAPIDockerEnvFile -v $env:USERPROFILE\.aspnet\https:/https/ --name $MortgageCalculatorAPIContainerName $MortgageCalculatorAPIImageName
+	docker ps
+}
+<# where 
+    $MortgageCalculatorAPIDockerEnvFile is docker environment file (usually the DockerEnv.txt file in the API's solution directory)
+    $MortgageCalculatorAPIContainerName is the container name you want (e.g. mycoolapi-container)
+#>
 ```
 
 ### Sample DockerEnv.txt
@@ -113,19 +148,13 @@ The `--env-file` text file will contain the environment variables the applicatio
 #Environment AppSettings Variables
 AppSettings__PublicPaidAccessUserId=00000000-0000-0000-0000-000000000000
 AppSettings__PublicPaidAccessUserPassword=yourPasswordHere
-```
-
-### PowerShell ScriptBlock to Run the Image in the 'MortgageCalculatorAPI' Container
-```
-$RunMortgageCalculatorAPIDockerContainer =
-{
-	$dockerEnvFile = Join-Path -Path $MortgageCalculatorAPISlnDir -ChildPath "DockerEnv.txt"
-	docker run -d -p 8080:5000 --env-file=$dockerEnvFile --name "MortgageCalculatorAPI" mortgagecalculatorapi
-	docker ps
-}
+#IPRateLimiting Variables
+IpRateLimiting__ClientWhiteList__0=SomeIdHere
+#ASP.NET CORE Variables
+ASPNETCORE_Kestrel__Certificates__Default__Password=yourDevCertsHttpsPassword
 ```
   
-After the container is running, navigate to http://localhost:8080/health/check to verify it is running properly. The https:// protocol is not being used at this time (v 1.0.3).
+After the container is running, navigate to https://localhost:8081/health/check to verify it is running properly. Redirection to https:// is active.
 
 ## Authorization
 Some endpoints will require authorization. In the absence of a dedicated authorization service, the API has an AuthorizeController to handle issuing a token for use on its endpoints that require authorization.
@@ -135,6 +164,7 @@ Route: POST /authorize/token/issue
 Headers:  
   - ClientId (Guid)
   - Password (string)
+
 #### Token Issued Successfully Response
 ```
 {
