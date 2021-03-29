@@ -1,7 +1,10 @@
-﻿namespace MAR.API.MortgageCalculator.Model.Interfaces
+﻿using System;
+
+namespace MAR.API.MortgageCalculator.Model.Interfaces
 {
     public interface IMortgageCalculationRequest
     {
+        Guid RequestId { get; set; }
         decimal PurchasePrice { get; set; }
         decimal APR { get; set; }
         int LoanTermYears { get; set; }

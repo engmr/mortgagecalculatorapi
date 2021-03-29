@@ -146,6 +146,27 @@ namespace MAR.API.MortgageCalculator.Controllers
         }
 
         /// <summary>
+        /// Get ActionResult from a mortgage calculation bulk result
+        /// </summary>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        protected IActionResult GetResultForMortageCalculation(IEnumerable<IMortgageCalculationResult> result)
+        {
+            if (result?.Any() == true)
+            {
+                if (result.All(r => r.IsSuccessful))
+                {
+                    return Ok(GetApiResponse(result));
+                }
+                if (result.Any(r => r.ValidationErrors.Any()) == true)
+                {
+                    return StatusCode((int)HttpStatusCode.BadRequest, GetApiResponse(result));
+                }
+            }
+            return StatusCode((int)HttpStatusCode.InternalServerError, GetApiResponse(result));
+        }
+
+        /// <summary>
         /// Get transction level logging scope
         /// </summary>
         /// <returns></returns>

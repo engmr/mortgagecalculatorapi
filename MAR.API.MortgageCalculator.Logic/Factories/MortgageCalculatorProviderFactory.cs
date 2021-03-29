@@ -31,6 +31,8 @@ namespace MAR.API.MortgageCalculator.Logic.Factories
         {
             switch (request)
             {
+                case null:
+                    throw new ArgumentNullException(nameof(request));
                 case MortgageCalculationRequest mcRequest:
                     _logger.LogDebug($"{nameof(GetProvider)} is producing a {nameof(CalculateNetCalculatorProvider)} provider");
                     return new CalculateNetCalculatorProvider(_loggerFactory, _validationMessageLocalizer, _errorMessageLocalizer, _httpClientProvider, mcRequest);
