@@ -1,9 +1,18 @@
 ﻿using MAR.API.MortgageCalculator.Model.Interfaces;
+using System;
 
 namespace MAR.API.MortgageCalculator.Model.Requests
 {
     public class MortgageCalculationRequest : IMortgageCalculationRequest
     {
+        public MortgageCalculationRequest()
+        {
+            RequestId = Guid.NewGuid();
+        }
+        /// <summary>
+        /// Unique id for reference purposes
+        /// </summary>
+        public Guid RequestId { get; set; }
         /// <summary>
         /// Purchase / sales price of home
         /// </summary>

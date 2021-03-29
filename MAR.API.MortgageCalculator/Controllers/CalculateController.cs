@@ -104,5 +104,38 @@ namespace MAR.API.MortgageCalculator.Controllers
                 return GetUnauthorizedResponse();
             }
         }
+
+        /// <summary>
+        /// Calculate (bulk)
+        /// </summary>
+        /// <param name="authHeaders"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        //[Authorize]
+        [Produces("application/json")]
+        [Route("bulk")]
+        [HttpPost]
+        public async Task<IActionResult> CalculateBulk([FromHeader] AuthorizationHeaders authHeaders, [FromBody] BulkMortgageCalculationRequest request)
+        {
+            using (_logger.BeginScope(GetTransactionLoggingScope()))
+            {
+                _logger.LogInformation($"{nameof(CalculatePaid)}" + " called with request {@request}");
+                if (!CheckAuthorizationHeadersForClientAndToken(authHeaders))
+                {
+                    return GetBadRequestResponse();
+                }
+
+                if (_authorizationProvider.IsTokenStillValid(authHeaders.ClientId, authHeaders.AuthorizationToken))
+                {
+                    return await Task.Run(() =>
+                    {
+                        var result = _mortgageCalculatorFacade.GetMortgageCalculations(request);
+                        return GetResultForMortageCalculation(result);
+                    });
+                }
+
+                return GetUnauthorizedResponse();
+            }
+        }
     }
 }

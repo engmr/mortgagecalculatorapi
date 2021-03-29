@@ -109,6 +109,14 @@
             <param name="request"></param>
             <returns></returns>
         </member>
+        <member name="M:MAR.API.MortgageCalculator.Controllers.CalculateController.CalculateBulk(MAR.API.MortgageCalculator.AuthorizationHeaders,MAR.API.MortgageCalculator.Model.Requests.BulkMortgageCalculationRequest)">
+            <summary>
+            Calculate (bulk)
+            </summary>
+            <param name="authHeaders"></param>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
         <member name="T:MAR.API.MortgageCalculator.Controllers.DomainBaseController">
             <summary>
             Shared logic amongst domain API controllers
@@ -160,6 +168,13 @@
         <member name="M:MAR.API.MortgageCalculator.Controllers.DomainBaseController.GetResultForMortageCalculation(MAR.API.MortgageCalculator.Model.Interfaces.IMortgageCalculationResult)">
             <summary>
             Get ActionResult from a mortgage calculation result
+            </summary>
+            <param name="result"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MAR.API.MortgageCalculator.Controllers.DomainBaseController.GetResultForMortageCalculation(System.Collections.Generic.IEnumerable{MAR.API.MortgageCalculator.Model.Interfaces.IMortgageCalculationResult})">
+            <summary>
+            Get ActionResult from a mortgage calculation bulk result
             </summary>
             <param name="result"></param>
             <returns></returns>
