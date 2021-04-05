@@ -53,6 +53,16 @@ namespace MAR.API.MortgageCalculator
             services.AddMemoryCache();
             services.AddHttpContextAccessor();
             ConfigureLocalization(services);
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(builder =>
+                {
+                    builder
+                        .AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader();
+                });
+            });
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -127,6 +137,8 @@ namespace MAR.API.MortgageCalculator
             app.UseSerilogRequestLogging();
 
             app.UseRouting();
+
+            app.UseCors();
 
             app.UseAuthorization();
 
