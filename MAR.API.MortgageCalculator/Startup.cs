@@ -105,6 +105,7 @@ namespace MAR.API.MortgageCalculator
         private void AddRateLimitingServices(IServiceCollection services)
         {
             services.Configure<IpRateLimitOptions>(Configuration.GetSection("IpRateLimiting"));
+            services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrategy>();
             services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
             services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
             services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();

@@ -132,7 +132,7 @@ $BuildMortgageCalculatorAPIDockerImage =
 ```
 $RunMortgageCalculatorAPIDockerImage =
 {
-	docker run -d -p 8080:5000 -p 8081:5001 --env-file=$MortgageCalculatorAPIDockerEnvFile -v $env:USERPROFILE\.aspnet\https:/https/ --name $MortgageCalculatorAPIContainerName $MortgageCalculatorAPIImageName
+	docker run -d -p 8082:5001 -p 8081:5000 --env-file=$MortgageCalculatorAPIDockerEnvFile -v $env:USERPROFILE\.aspnet\https:/https/ --name $MortgageCalculatorAPIContainerName $MortgageCalculatorAPIImageName
 	docker ps
 }
 <# where 
